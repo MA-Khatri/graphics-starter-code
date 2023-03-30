@@ -16,3 +16,6 @@ camera.o: camera.cpp vec4.hpp ray.hpp
 mat4.o: mat4.cpp vec4.hpp
 scene.o: scene.cpp camera.hpp
 rayTracer.o: rayTracer.cpp scene.hpp image.hpp
+
+clean: 
+	rm ./*.o ../bin/main 

@@ -15,13 +15,13 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
         }
     }
 
-    //Start at the top right corner. Go left to right, top to bottom
+    // Start at the top right corner. Go left to right, top to bottom
     for (int j = (cam.height - 1); j >= 0; j--)
     {
         for (int i = 0; i < (cam.width); i++)
         {
-            //TODO: rewrite this to get a gradient
-            Color c = black;
+            // TODO: rewrite this to get a gradient
+            Color c = Color(float(i) / output.height, float(j) / output.width, float(i) * float(j) / (output.height * output.width));
             output.setPixel(i, j, c);
         }
     }

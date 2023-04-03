@@ -21,7 +21,8 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
         for (int i = 0; i < (cam.width); i++)
         {
             // TODO: rewrite this to get a gradient
-            Color c = Color(float(i) / output.height, float(j) / output.width, float(i) * float(j) / (output.height * output.width));
+            // Color c = Color(float(i) / output.height, float(j) / output.width, float(i) * float(j) / (output.height * output.width));
+            Color c = Color(float(i) / output.height, float(j) / output.width, 0);
             output.setPixel(i, j, c);
         }
     }

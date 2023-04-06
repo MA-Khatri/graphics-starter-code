@@ -17,7 +17,11 @@ int main() {
     Plane plane;
     scene.items.push_back(&plane);
 
-    Camera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
+    Sphere sphere;
+    sphere.translate(*(new vec4(0, 0, 2, 0)));
+    scene.items.push_back(&sphere);
+
+    Camera cam(vec4(-3, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     scene.cameras.push_back(&cam);
 
     RayTracer rayTracer;

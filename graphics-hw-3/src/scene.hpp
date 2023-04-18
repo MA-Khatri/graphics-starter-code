@@ -5,8 +5,8 @@
 
 class Scene {
 public:
-    Color backgroundColor;
-    float ambientLight = 0;
+    Color backgroundColor = white;
+    float ambientLight = 0.5;
 
     std::vector<Geometry*> items;
     std::vector<Camera*> cameras;

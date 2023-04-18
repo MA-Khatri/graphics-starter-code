@@ -9,8 +9,8 @@
 #include "renderers/rayTracer.hpp"
 
 int main() {
-    int nx = 400;
-    int ny = 400;
+    int nx = 1000;
+    int ny = 1000;
 
     Scene scene;
 
@@ -24,7 +24,7 @@ int main() {
     sphereMat.c = red;
     sphere.setMaterial(sphereMat);
     
-    vec4 translate_vec(0,0,1,0);
+    vec4 translate_vec(0,0,0.5,0);
     sphere.translate(translate_vec);
 
     vec4 scale_vec(.5,.5,.5,0);

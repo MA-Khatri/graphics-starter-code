@@ -8,4 +8,7 @@ public:
     Hit traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth);
 
     void findShade(Scene & scene, Hit & hit, int depth);
+
+private:
+    std::vector<int> horizontalIter, verticalIter;
 };

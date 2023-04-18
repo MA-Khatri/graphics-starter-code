@@ -9,8 +9,8 @@
 #include "renderers/rayTracer.hpp"
 
 int main() {
-    int nx = 1000;
-    int ny = 1000;
+    int nx = 2000;
+    int ny = 2000;
 
     Scene scene;
 

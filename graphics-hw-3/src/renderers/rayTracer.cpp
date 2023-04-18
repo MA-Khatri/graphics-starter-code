@@ -1,4 +1,7 @@
 #include "rayTracer.hpp"
+#include<algorithm>
+#include<execution>
+#include<chrono>
 
 Image RayTracer::takePicture(Scene &scene, int camIndex)
 {
@@ -19,16 +22,27 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
     // int sampleRate = 1000;
     int sampleRate = 100;
 
-    //Start at the top right corner. Go left to right, top to bottom
-    for (int j = (cam.height - 1); j >= 0; j--)
-    {
-        // TODO: This doesn't quite work right yet but I'll move on for now
-        printf("\r%3f%%", (1.0 - float(j)/float(output.width)) * 100);
+    auto startTime = std::chrono::high_resolution_clock::now();
 
-        for (int i = 0; i < (cam.width); i++)
+#define MULTITHREADED 0
+#if MULTITHREADED
+
+    // In order to use std::for_each, we need to initialize iterators for each loop
+    // (Note: these iterators are defined in rayTracer.hpp)
+    horizontalIter.resize(cam.width);
+    verticalIter.resize(cam.height);
+    for (int i = 0; i < cam.width; i++) horizontalIter[i] = i;
+    for (int j = cam.height - 1; j >= 0; j--) verticalIter[j] = j;
+
+    std::for_each(std::execution::par, verticalIter.begin(), verticalIter.end(), 
+    [&](int j)
+    {
+        std::for_each(std::execution::par, horizontalIter.begin(), horizontalIter.end(),
+        [&](int i)
         {
             Color c = output.getPixel(i, j);
 
+            /*
             // Generate multiple randomized samples per pixel
             for (int k = 0; k < sampleRate; k++)
             {                
@@ -49,6 +63,89 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 c.g += hit.color.g / sampleRate;
                 c.b += hit.color.b / sampleRate;   
             }
+            */
+           
+            {
+                float randX = 0.0;
+                float randY = 0.0;
+                // if (sampleRate > 1)
+                // {
+                //     randX = float(rand())/float(RAND_MAX) - 0.5;
+                //     randY = float(rand())/float(RAND_MAX) - 0.5;
+                // }
+
+                ray eyeRay = cam.getEyeRay(i + .5 + randX, j + .5 + randY);
+
+                Hit hit;
+                hit = this->traceRay(scene, eyeRay, hit, 0);
+
+                c.r += hit.color.r;
+                c.g += hit.color.g;
+                c.b += hit.color.b;  
+            }
+
+            // Add gamma correction (this makes sure this matches with the provided result)
+            c.r = (float)pow((double)c.r, 1 / 2.2);
+            c.g = (float)pow((double)c.g, 1 / 2.2);
+            c.b = (float)pow((double)c.b, 1 / 2.2);
+
+            output.setPixel(i, j, c);
+        });
+    });
+
+#else
+
+    //Start at the top right corner. Go left to right, top to bottom
+    for (int j = (cam.height - 1); j >= 0; j--)
+    {
+        // TODO: This doesn't quite work right yet but I'll move on for now
+        printf("\r%3f%%", (1.0 - float(j)/float(output.width)) * 100);
+
+        for (int i = 0; i < (cam.width); i++)
+        {
+            Color c = output.getPixel(i, j);
+
+            /*
+            // Generate multiple randomized samples per pixel
+            for (int k = 0; k < sampleRate; k++)
+            {                
+                float randX = 0.0;
+                float randY = 0.0;
+                if (sampleRate > 1)
+                {
+                    randX = float(rand())/float(RAND_MAX) - 0.5;
+                    randY = float(rand())/float(RAND_MAX) - 0.5;
+                }
+
+                ray eyeRay = cam.getEyeRay(i + .5 + randX, j + .5 + randY);
+
+                Hit hit;
+                hit = this->traceRay(scene, eyeRay, hit, 0);
+
+                c.r += hit.color.r / sampleRate;
+                c.g += hit.color.g / sampleRate;
+                c.b += hit.color.b / sampleRate;   
+            }
+            */
+
+                         
+            float randX = 0.0;
+            float randY = 0.0;
+            // if (sampleRate > 1)
+            // {
+            //     randX = float(rand())/float(RAND_MAX) - 0.5;
+            //     randY = float(rand())/float(RAND_MAX) - 0.5;
+            // }
+
+            ray eyeRay = cam.getEyeRay(i + .5 + randX, j + .5 + randY);
+
+            Hit hit;
+            hit = this->traceRay(scene, eyeRay, hit, 0);
+
+            c.r += hit.color.r;
+            c.g += hit.color.g;
+            c.b += hit.color.b;   
+            
 
             // Add gamma correction (this makes sure this matches with the provided result)
             c.r = (float)pow((double)c.r, 1 / 2.2);
@@ -60,6 +157,12 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
     }
 
     printf("\n");
+
+#endif
+
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
+    printf("Render time: %lu ms\n", duration.count());
 
     return output;
 }
